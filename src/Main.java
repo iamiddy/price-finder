@@ -1,7 +1,9 @@
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -10,8 +12,52 @@ public class Main {
          shops = Arrays.asList(new Shop("BestPrice"),
                 new Shop("LetsSaveBig"),
                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("LetsSaveBig"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("LetsSaveBig"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("LetsSaveBig"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
+                 new Shop("MyFavoriteShop"),
+                 new Shop("MyFavoergsdgriteShopYeee"),
                 new Shop("BuyItAll"));
     }
+
+    private static final Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100), new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true); // Use daemon threads—they don’t prevent the termination of the program.
+            return  thread;
+        }
+    });
+
 
     public static void main(String[] args) {
 
@@ -33,8 +79,8 @@ public class Main {
 
         long start = System.nanoTime();
         //System.out.println(findPricesStreams("myPhone27S")); //Done in 4073 msecs
-        //System.out.println(findPricesParalleStreams("myPhone27S")); // Done in 1061 msecs
-        //System.out.println(findPrices("myPhone27S")); //Done in 1054 msecs
+        //System.out.println(findPricesParalleStreams("myPhone27S")); // Done in 5091 msecs
+        System.out.println("P>>" +findPrices("myPhone27S")); //Done in 1064 msecs
         long duration = (System.nanoTime() - start) / 1_000_000;
         System.out.println("Done in " + duration + " msecs");
     }
@@ -49,7 +95,7 @@ public class Main {
 
     public static List<String> findPrices(String product){
         List<CompletableFuture<String>> priceFutures = shops.stream()
-                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getName() + " price is " + shop.getPrice(product)))
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getName() + " price is " + shop.getPrice(product),executor))
                 .collect(Collectors.toList());
 
         return priceFutures.stream()

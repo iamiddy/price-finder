@@ -79,7 +79,7 @@ public class Main {
 
         long start = System.nanoTime();
         //System.out.println(findPricesStreams("myPhone27S")); //Done in 4073 msecs
-        //System.out.println(findPricesParalleStreams("myPhone27S")); // Done in 5091 msecs
+      //System.out.println(findPricesParalleStreams("myPhone27S")); // Done in 5091 msecs
         System.out.println("P>>" +findPrices("myPhone27S")); //Done in 1064 msecs
         long duration = (System.nanoTime() - start) / 1_000_000;
         System.out.println("Done in " + duration + " msecs");
@@ -90,12 +90,12 @@ public class Main {
     }
 
     public static List<String> findPricesParalleStreams(String product){
-        return shops.parallelStream().map(shop -> String.format("%s price is %.2f", shop.getName(), shop.getPrice(product))).collect(Collectors.toList());
+        return shops.parallelStream().map(shop -> shop.getPrice(product)).collect(Collectors.toList());
     }
 
     public static List<String> findPrices(String product){
         List<CompletableFuture<String>> priceFutures = shops.stream()
-                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getName() + " price is " + shop.getPrice(product),executor))
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product),executor))
                 .collect(Collectors.toList());
 
         return priceFutures.stream()

@@ -80,7 +80,8 @@ public class Main {
         long start = System.nanoTime();
         //System.out.println(findPricesStreams("myPhone27S")); //Done in 4073 msecs
       //System.out.println(findPricesParalleStreams("myPhone27S")); // Done in 5091 msecs
-        System.out.println("P>>" +findPrices("myPhone27S")); //Done in 1064 msecs
+       // System.out.println("P>>" +findPrices("myPhone27S")); //Done in 1113 msecs
+        System.out.println("P>>" +findPricesComposed("myPhone27S")); //Done in 1067 msecs
         long duration = (System.nanoTime() - start) / 1_000_000;
         System.out.println("Done in " + duration + " msecs");
     }
@@ -100,6 +101,18 @@ public class Main {
 
         return priceFutures.stream()
                 .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> findPricesComposed(String product){
+        List<CompletableFuture<String>> priceFutures = shops.stream()
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product),executor))
+                .map(future -> future.thenApply(Quote::parse))
+                .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote),executor)))// compose the resulting future with another async task, applying the discount code
+                .collect(Collectors.toList());
+
+        return priceFutures.stream()
+                .map(CompletableFuture::join) // wait for all futures in the stream to be completed & extract their respective result
                 .collect(Collectors.toList());
     }
 }
